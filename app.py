@@ -1,12 +1,10 @@
 import streamlit as st
 import pandas as pd
-import requests
 from datetime import datetime
-from urllib.parse import urlparse
 
 st.set_page_config(
-    page_title="TeaHack TikTok Optimizer",
-    page_icon="📈",
+    page_title="TeaHack TikTok Growth Booster",
+    page_icon="🚀",
     layout="wide"
 )
 
@@ -14,176 +12,43 @@ st.set_page_config(
 # SESSION
 # =========================
 
-defaults = {
-    "history": [],
-    "video_name": "",
-    "hook": "",
-    "author": "",
-    "thumbnail": "",
-    "tiktok_url": "",
-}
-
-for key, value in defaults.items():
-    if key not in st.session_state:
-        st.session_state[key] = value
-
-
-# =========================
-# URL VALIDATION
-# =========================
-
-def valid_tiktok_url(url):
-    try:
-        host = urlparse(url).netloc.lower()
-
-        allowed = [
-            "tiktok.com",
-            "www.tiktok.com",
-            "vm.tiktok.com",
-            "vt.tiktok.com",
-        ]
-
-        return host in allowed or host.endswith(".tiktok.com")
-
-    except Exception:
-        return False
-
-
-# =========================
-# OEMBED FETCH
-# =========================
-
-def get_tiktok_info(url):
-
-    if not valid_tiktok_url(url):
-        return None, "Link TikTok không hợp lệ."
-
-    endpoint = "https://www.tiktok.com/oembed"
-
-    try:
-        response = requests.get(
-            endpoint,
-            params={"url": url},
-            timeout=12,
-            headers={
-                "User-Agent":
-                "Mozilla/5.0 TikTokOptimizer/1.0"
-            }
-        )
-
-        if response.status_code != 200:
-            return None, f"TikTok trả về lỗi {response.status_code}"
-
-        data = response.json()
-
-        return {
-            "title": data.get("title", ""),
-            "author": data.get("author_name", ""),
-            "author_url": data.get("author_url", ""),
-            "thumbnail": data.get("thumbnail_url", ""),
-            "provider": data.get("provider_name", ""),
-        }, None
-
-    except requests.RequestException:
-        return None, "Không thể kết nối TikTok."
-
-    except Exception as e:
-        return None, f"Lỗi: {e}"
-
+if "history" not in st.session_state:
+    st.session_state.history = []
 
 # =========================
 # HEADER
 # =========================
 
-st.title("TeaHack TikTok Optimizer")
+st.title("🚀 TeaHack TikTok Growth Booster")
 
 st.caption(
-    "Dán link TikTok hoặc nhập dữ liệu thủ công để phân tích video."
+    "Phân tích video và tạo kế hoạch tối ưu để tăng lượt xem, tương tác và khả năng phân phối."
 )
 
-st.info(
-    "Viral Score là chỉ số phân tích do tool tự tính, "
-    "không phải điểm chính thức của TikTok."
-)
-
-
 # =========================
-# LINK IMPORT
+# INPUT
 # =========================
 
-st.subheader("🔗 Nhập link TikTok")
-
-url = st.text_input(
-    "Link video TikTok",
-    placeholder="https://www.tiktok.com/@username/video/..."
-)
-
-if st.button(
-    "Lấy thông tin video",
-    use_container_width=True
-):
-
-    if not url:
-        st.warning("Hãy dán link TikTok trước.")
-
-    else:
-        with st.spinner("Đang đọc thông tin video..."):
-
-            info, error = get_tiktok_info(url)
-
-        if error:
-            st.error(error)
-
-        else:
-            st.session_state.tiktok_url = url
-            st.session_state.video_name = info["title"]
-            st.session_state.author = info["author"]
-            st.session_state.thumbnail = info["thumbnail"]
-
-            st.success("Đã lấy thông tin video.")
-
-
-# =========================
-# VIDEO PREVIEW
-# =========================
-
-if st.session_state.thumbnail:
-
-    st.subheader("Video đã nhận diện")
-
-    st.image(
-        st.session_state.thumbnail,
-        width=300
-    )
-
-    if st.session_state.author:
-        st.write(
-            f"**Tác giả:** {st.session_state.author}"
-        )
-
-    if st.session_state.video_name:
-        st.write(
-            f"**Caption:** {st.session_state.video_name}"
-        )
-
-
-# =========================
-# DATA INPUT
-# =========================
-
-st.divider()
-
-st.subheader("Nhập dữ liệu Analytics")
+st.subheader("Thông tin video")
 
 video_name = st.text_input(
-    "Tên / Caption video",
-    value=st.session_state.video_name
+    "Tên video",
+    placeholder="Ví dụ: Video AI biến hình"
+)
+
+topic = st.text_input(
+    "Chủ đề video",
+    placeholder="Ví dụ: AI, anime, review, hài..."
 )
 
 hook = st.text_input(
     "Hook 1–3 giây đầu",
-    value=st.session_state.hook,
     placeholder="Ví dụ: Đừng lướt nếu bạn đang..."
+)
+
+caption = st.text_area(
+    "Caption hiện tại",
+    placeholder="#fyp #xh..."
 )
 
 col1, col2 = st.columns(2)
@@ -193,28 +58,28 @@ with col1:
     views = st.number_input(
         "Lượt xem",
         min_value=0,
-        value=0,
+        value=1000,
         step=100
     )
 
     likes = st.number_input(
         "Lượt thích",
         min_value=0,
-        value=0,
+        value=100,
         step=10
     )
 
     comments = st.number_input(
         "Bình luận",
         min_value=0,
-        value=0,
+        value=10,
         step=1
     )
 
     shares = st.number_input(
         "Chia sẻ",
         min_value=0,
-        value=0,
+        value=5,
         step=1
     )
 
@@ -228,9 +93,9 @@ with col2:
     )
 
     avg_watch = st.number_input(
-        "Thời gian xem trung bình (giây)",
+        "Thời gian xem trung bình",
         min_value=0.0,
-        value=10.0,
+        value=12.0,
         step=0.5
     )
 
@@ -241,320 +106,383 @@ with col2:
         20
     )
 
+    target_views = st.number_input(
+        "Mục tiêu lượt xem",
+        min_value=100,
+        value=10000,
+        step=1000
+    )
 
 # =========================
-# ANALYSIS
+# HELPERS
+# =========================
+
+def generate_captions(topic, hook):
+
+    base_topic = topic if topic else "video này"
+
+    options = [
+        f"{hook or 'Coi tới cuối mới thấy bất ngờ'} 👀 #{base_topic.replace(' ', '')}",
+        f"Tưởng bình thường cho tới đoạn cuối 💀 #{base_topic.replace(' ', '')}",
+        f"Ai xem tới cuối mới hiểu 😳 #{base_topic.replace(' ', '')}",
+        f"Không ngờ {base_topic} lại ra kết quả như này...",
+        f"Rate kết quả này từ 1–10 đi 👇 #{base_topic.replace(' ', '')}",
+    ]
+
+    return options
+
+
+def generate_hashtags(topic):
+
+    clean = topic.replace(" ", "") if topic else "viral"
+
+    return [
+        f"#{clean}",
+        "#fyp",
+        "#xuhuong",
+        "#viral",
+        "#tiktokvn",
+        "#trend",
+    ]
+
+
+def generate_ctas():
+
+    return [
+        "Bạn chấm video này mấy điểm?",
+        "Muốn phần 2 không?",
+        "Gửi cho đứa bạn cần xem cái này.",
+        "Bạn chọn phiên bản nào?",
+        "Comment chủ đề tiếp theo mình làm.",
+    ]
+
+
+# =========================
+# ANALYZE
 # =========================
 
 if st.button(
-    "🚀 Phân tích video",
+    "🚀 TẠO KẾT QUẢ",
     type="primary",
     use_container_width=True
 ):
 
     if views <= 0:
+        st.error("Lượt xem phải lớn hơn 0.")
+        st.stop()
 
+    # =========================
+    # METRICS
+    # =========================
+
+    like_rate = likes / views * 100
+    comment_rate = comments / views * 100
+    share_rate = shares / views * 100
+
+    retention = (
+        avg_watch /
+        max(duration, 1)
+    ) * 100
+
+    engagement = (
+        likes +
+        comments * 2 +
+        shares * 3
+    ) / views * 100
+
+    # =========================
+    # SCORE
+    # =========================
+
+    retention_score = min(
+        retention / 100,
+        1
+    ) * 45
+
+    engagement_score = min(
+        engagement / 15,
+        1
+    ) * 35
+
+    share_score = min(
+        share_rate / 2,
+        1
+    ) * 20
+
+    growth_score = round(
+        retention_score +
+        engagement_score +
+        share_score,
+        1
+    )
+
+    # =========================
+    # RESULT
+    # =========================
+
+    st.divider()
+
+    st.header("📊 Kết quả")
+
+    c1, c2 = st.columns(2)
+
+    with c1:
+
+        st.metric(
+            "Growth Score",
+            f"{growth_score}/100"
+        )
+
+        st.metric(
+            "Engagement",
+            f"{engagement:.2f}%"
+        )
+
+    with c2:
+
+        st.metric(
+            "Retention",
+            f"{retention:.1f}%"
+        )
+
+        st.metric(
+            "Share Rate",
+            f"{share_rate:.2f}%"
+        )
+
+    st.progress(
+        min(int(growth_score), 100)
+    )
+
+    # =========================
+    # DIAGNOSIS
+    # =========================
+
+    st.header("🧠 Chẩn đoán")
+
+    if retention < 40:
         st.error(
-            "Lượt xem phải lớn hơn 0 để phân tích."
+            "Retention thấp — phần đầu video chưa giữ được người xem."
+        )
+
+    elif retention < 60:
+        st.warning(
+            "Retention trung bình — nên cắt các đoạn chậm."
+        )
+
+    else:
+        st.success(
+            "Retention đang khá tốt."
+        )
+
+    if like_rate < 3:
+        st.warning(
+            "Like rate thấp — nội dung chưa tạo đủ phản ứng."
+        )
+
+    if comment_rate < 0.3:
+        st.warning(
+            "Comment thấp — cần thêm câu hỏi hoặc tranh luận."
+        )
+
+    if share_rate < 0.3:
+        st.warning(
+            "Share thấp — cần tăng yếu tố bất ngờ hoặc hữu ích."
+        )
+
+    # =========================
+    # HOOK
+    # =========================
+
+    st.header("🎣 Hook")
+
+    hook_words = len(hook.split())
+
+    if not hook:
+
+        st.warning(
+            "Chưa nhập Hook."
+        )
+
+    elif hook_words <= 10:
+
+        st.success(
+            "Hook ngắn và dễ tiếp nhận."
+        )
+
+    elif hook_words <= 18:
+
+        st.info(
+            "Hook hơi dài. Có thể rút ngắn."
         )
 
     else:
 
-        safe_views = max(views, 1)
-
-        like_rate = (
-            likes / safe_views
-        ) * 100
-
-        comment_rate = (
-            comments / safe_views
-        ) * 100
-
-        share_rate = (
-            shares / safe_views
-        ) * 100
-
-        engagement_rate = (
-            likes
-            + comments * 2
-            + shares * 3
-        ) / safe_views * 100
-
-        retention = (
-            avg_watch /
-            max(duration, 1)
-        ) * 100
-
-
-        # =========================
-        # VIRAL SCORE
-        # =========================
-
-        retention_score = min(
-            retention / 100,
-            1
-        ) * 45
-
-        engagement_score = min(
-            engagement_rate / 15,
-            1
-        ) * 35
-
-        share_score = min(
-            share_rate / 2,
-            1
-        ) * 20
-
-        viral_score = round(
-            retention_score
-            + engagement_score
-            + share_score,
-            1
+        st.warning(
+            "Hook quá dài. Thử giảm xuống 5–10 từ."
         )
 
+    # =========================
+    # CAPTIONS
+    # =========================
 
-        # =========================
-        # RESULTS
-        # =========================
+    st.header("🔥 Caption đề xuất")
 
-        st.divider()
+    for x in generate_captions(topic, hook):
 
-        st.subheader("📊 Kết quả")
-
-        c1, c2 = st.columns(2)
-
-        with c1:
-
-            st.metric(
-                "Viral Score",
-                f"{viral_score}/100"
-            )
-
-            st.metric(
-                "Engagement",
-                f"{engagement_rate:.2f}%"
-            )
-
-        with c2:
-
-            st.metric(
-                "Retention",
-                f"{retention:.1f}%"
-            )
-
-            st.metric(
-                "Share Rate",
-                f"{share_rate:.2f}%"
-            )
-
-
-        # =========================
-        # PROGRESS
-        # =========================
-
-        st.write("**Viral Meter**")
-
-        st.progress(
-            min(
-                int(viral_score),
-                100
-            )
+        st.code(
+            x,
+            language=None
         )
 
+    # =========================
+    # HASHTAGS
+    # =========================
 
-        # =========================
-        # RATING
-        # =========================
+    st.header("#️⃣ Hashtag")
 
-        st.subheader("Đánh giá")
+    tags = generate_hashtags(topic)
 
-        if viral_score >= 80:
+    st.code(
+        " ".join(tags),
+        language=None
+    )
 
-            st.success(
-                "🔥 Các chỉ số của video đang rất mạnh."
-            )
+    # =========================
+    # CTA
+    # =========================
 
-        elif viral_score >= 60:
+    st.header("💬 CTA tăng tương tác")
 
-            st.success(
-                "✅ Video có hiệu suất tốt."
-            )
+    for cta in generate_ctas():
 
-        elif viral_score >= 40:
-
-            st.warning(
-                "⚠️ Hiệu suất trung bình."
-            )
-
-        else:
-
-            st.error(
-                "📉 Video đang có nhiều chỉ số yếu."
-            )
-
-
-        # =========================
-        # HOOK
-        # =========================
-
-        st.subheader("🎣 Hook")
-
-        if not hook:
-
-            st.warning(
-                "Chưa nhập Hook để phân tích."
-            )
-
-        else:
-
-            words = len(
-                hook.split()
-            )
-
-            if words <= 12:
-
-                st.success(
-                    "Hook ngắn gọn."
-                )
-
-            elif words <= 20:
-
-                st.info(
-                    "Hook hơi dài."
-                )
-
-            else:
-
-                st.warning(
-                    "Hook dài. Thử rút xuống khoảng 5–12 từ."
-                )
-
-
-        # =========================
-        # RECOMMENDATIONS
-        # =========================
-
-        st.subheader("💡 Gợi ý tối ưu")
-
-        tips = []
-
-        if retention < 40:
-
-            tips.append(
-                "Thay đổi mạnh 1–3 giây đầu video."
-            )
-
-        elif retention < 60:
-
-            tips.append(
-                "Cắt bớt các đoạn chậm để tăng retention."
-            )
-
-        if like_rate < 5:
-
-            tips.append(
-                "Tăng payoff hoặc giá trị cảm xúc để kích thích Like."
-            )
-
-        if comment_rate < 0.5:
-
-            tips.append(
-                "Thêm câu hỏi cuối video để tăng bình luận."
-            )
-
-        if share_rate < 0.5:
-
-            tips.append(
-                "Thử nội dung hữu ích, bất ngờ hoặc dễ gửi cho bạn bè."
-            )
-
-        if duration > 30 and retention < 60:
-
-            tips.append(
-                "Thử phiên bản video ngắn hơn."
-            )
-
-        if post_hour < 18 or post_hour > 22:
-
-            tips.append(
-                "Test thêm các khung giờ tối rồi so sánh với dữ liệu hiện tại."
-            )
-
-        if not tips:
-
-            tips.append(
-                "Các chỉ số khá ổn. Tiếp tục thử nhiều Hook khác nhau."
-            )
-
-        for tip in tips:
-
-            st.write(
-                "• " + tip
-            )
-
-
-        # =========================
-        # SAVE HISTORY
-        # =========================
-
-        result = {
-
-            "time": datetime.now().strftime(
-                "%Y-%m-%d %H:%M"
-            ),
-
-            "video": (
-                video_name
-                or "Untitled"
-            ),
-
-            "author":
-                st.session_state.author,
-
-            "url":
-                st.session_state.tiktok_url,
-
-            "views":
-                views,
-
-            "likes":
-                likes,
-
-            "comments":
-                comments,
-
-            "shares":
-                shares,
-
-            "duration":
-                duration,
-
-            "avg_watch":
-                avg_watch,
-
-            "post_hour":
-                post_hour,
-
-            "engagement":
-                round(
-                    engagement_rate,
-                    2
-                ),
-
-            "retention":
-                round(
-                    retention,
-                    2
-                ),
-
-            "viral_score":
-                viral_score,
-        }
-
-        st.session_state.history.append(
-            result
+        st.write(
+            "• " + cta
         )
 
+    # =========================
+    # TARGET
+    # =========================
+
+    st.header("🎯 Mục tiêu")
+
+    multiplier = target_views / views
+
+    estimated_likes = round(
+        likes * multiplier
+    )
+
+    estimated_comments = round(
+        comments * multiplier
+    )
+
+    estimated_shares = round(
+        shares * multiplier
+    )
+
+    st.write(
+        f"Nếu video giữ được tỷ lệ hiện tại và đạt **{target_views:,} view**, "
+        f"các chỉ số tương ứng sẽ khoảng:"
+    )
+
+    t1, t2, t3 = st.columns(3)
+
+    t1.metric(
+        "Like",
+        f"{estimated_likes:,}"
+    )
+
+    t2.metric(
+        "Comment",
+        f"{estimated_comments:,}"
+    )
+
+    t3.metric(
+        "Share",
+        f"{estimated_shares:,}"
+    )
+
+    # =========================
+    # ACTION PLAN
+    # =========================
+
+    st.header("📈 Kế hoạch video tiếp theo")
+
+    plan = []
+
+    if retention < 50:
+        plan.append(
+            "Đưa cảnh mạnh nhất vào 1 giây đầu."
+        )
+
+    if duration > 30 and retention < 60:
+        plan.append(
+            "Tạo thêm phiên bản ngắn hơn 15–25 giây."
+        )
+
+    if share_rate < 0.5:
+        plan.append(
+            "Thêm yếu tố khiến người xem muốn gửi video cho bạn bè."
+        )
+
+    if comment_rate < 0.5:
+        plan.append(
+            "Kết thúc video bằng một câu hỏi ngắn."
+        )
+
+    if likes / views * 100 < 5:
+        plan.append(
+            "Tăng payoff ở cuối video."
+        )
+
+    plan.append(
+        "Test ít nhất 3 Hook khác nhau cho cùng một ý tưởng."
+    )
+
+    plan.append(
+        "So sánh kết quả sau mỗi video thay vì chỉ nhìn tổng view."
+    )
+
+    for i, item in enumerate(plan, 1):
+
+        st.write(
+            f"**{i}.** {item}"
+        )
+
+    # =========================
+    # SAVE
+    # =========================
+
+    st.session_state.history.append({
+
+        "time": datetime.now().strftime(
+            "%Y-%m-%d %H:%M"
+        ),
+
+        "video":
+            video_name or "Untitled",
+
+        "views":
+            views,
+
+        "likes":
+            likes,
+
+        "comments":
+            comments,
+
+        "shares":
+            shares,
+
+        "retention":
+            round(retention, 2),
+
+        "engagement":
+            round(engagement, 2),
+
+        "growth_score":
+            growth_score
+    })
 
 # =========================
 # HISTORY
@@ -564,14 +492,14 @@ if st.session_state.history:
 
     st.divider()
 
-    st.subheader("📚 Lịch sử")
+    st.header("📚 Lịch sử video")
 
     df = pd.DataFrame(
         st.session_state.history
     )
 
     df = df.sort_values(
-        "viral_score",
+        "growth_score",
         ascending=False
     )
 
@@ -584,30 +512,7 @@ if st.session_state.history:
     best = df.iloc[0]
 
     st.success(
-        f"🏆 Video tốt nhất: "
+        f"🏆 Video có chỉ số tốt nhất: "
         f"{best['video']} — "
-        f"{best['viral_score']}/100"
+        f"{best['growth_score']}/100"
     )
-
-    csv = df.to_csv(
-        index=False
-    ).encode(
-        "utf-8-sig"
-    )
-
-    st.download_button(
-        "⬇️ Tải lịch sử CSV",
-        csv,
-        "tiktok_history.csv",
-        "text/csv",
-        use_container_width=True
-    )
-
-    if st.button(
-        "Xóa lịch sử",
-        use_container_width=True
-    ):
-
-        st.session_state.history = []
-
-        st.rerun()
